@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {{ template "head" . }}
+</head>
+<body>
+  <header>{{ template "header" . }}</header>
+  <main>{{ block "main" . }}{{ end }}</main>
+  <footer>{{ template "footer" . }}</footer>
+</body>
+</html>
