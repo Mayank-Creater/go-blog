@@ -5,14 +5,14 @@
     {{ range .Posts }}
       <li>
         <article class="post-preview">
-          <h2><a href="/">{{ .Metadata.Title }}</a></h2>
+          <h2><a href="/{{ .Metadata.Title | slugify }}.html">{{ .Metadata.Title }}</a></h2>
           <time datetime="{{ .Metadata.Date }}">{{ .Metadata.Date }}</time>
           {{ if .Metadata.Tags }}
             <div class="tags">
               {{ range .Metadata.Tags }}<span class="tag">{{ . }}</span>{{ end }}
             </div>
           {{ end }}
-          <p>{{ .Content | safeHTML}}</p>
+          <!-- <p>{{ .Content | safeHTML}}</p> -->
         </article>
       </li>
     {{ end }}

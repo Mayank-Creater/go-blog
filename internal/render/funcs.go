@@ -3,9 +3,15 @@ package render
 import (
 	"html/template"
 	"regexp"
-	// "strings"
+	"strings"
 	"time"
 )
+
+func slugify(text string) string{
+	lowerText :=  strings.ToLower(text)
+	words := strings.Fields(lowerText)
+	return strings.Join(words, "-")
+}
 
 var templateFuncs = template.FuncMap{
 		"dateFormat": func(layout, dateStr string) string {
@@ -20,6 +26,7 @@ var templateFuncs = template.FuncMap{
 			// strip tags for excerpts
 			return regexp.MustCompile(`<[^>]*>`).ReplaceAllString(string(html), "")
 		},
+		"slugify": slugify,
 		// "markdown": func(s string) template.HTML {
 		// 	var buf strings.Builder
 		// 	md.Convert([]byte(s), &buf)

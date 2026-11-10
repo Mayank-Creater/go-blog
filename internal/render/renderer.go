@@ -13,7 +13,7 @@ type HomepageData struct{
 	Posts []content.Content
 }
 
-func Render(posts []content.Content){
+func Render(posts []content.Content, homePath string){
 	fmt.Println("IN render")
 
 	baseTmpl := template.New("base.html").Option("missingkey=error").Funcs(templateFuncs)
@@ -25,7 +25,7 @@ func Render(posts []content.Content){
 	homeTmpl = template.Must(homeTmpl.ParseFiles("templates/index.html"))
 
 	var homeBuf bytes.Buffer
-	homeFile, _ := os.Create("public/index.html")
+	homeFile, _ := os.Create(homePath+"/public/index.html")
 	defer homeFile.Close()
 
 	homeData := HomepageData{
@@ -36,24 +36,27 @@ func Render(posts []content.Content){
 	if err != nil {
 		fmt.Println(err)
 	}
-	_ = os.WriteFile("public/index.html", homeBuf.Bytes(), 0644)
+	_, err = homeBuf.WriteTo(homeFile)
+	if err != nil {
+		fmt.Println(err)
+	}
 
 
 	postTmpl := template.Must(baseTmpl.Clone())
 	postTmpl = template.Must(postTmpl.ParseFiles("templates/post.html"))
 
-	targetPost := posts[0]
-	
-	postFile, _ := os.Create("public/post-hello-world.html")
-	defer postFile.Close()
-	
-	var postBuf bytes.Buffer
-	err = postTmpl.ExecuteTemplate(&postBuf, "base.html", targetPost)
-	if err != nil {
-		fmt.Println(err)
-	}
-	
-	_ = os.WriteFile("public/post.html", postBuf.Bytes(), 0644)
+	for _, post := range posts {
+		filePath := fmt.Sprintf("/public/%s.html", slugify(post.Metadata.Title))
+		postFile, _ := os.Create(homePath+filePath)
+		defer postFile.Close()
+		
+		var postBuf bytes.Buffer
+		err = postTmpl.ExecuteTemplate(&postBuf, "base.html", post)
+		if err != nil {
+			fmt.Println(err)
+		}
+		
+		_ = os.WriteFile(homePath+filePath, postBuf.Bytes(), 0644)
 
-	fmt.Println(postBuf.String())
+	}
 }
