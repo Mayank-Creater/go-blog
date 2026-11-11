@@ -1,8 +1,12 @@
 {{define "header"}}
-<header>
-    <nav>
-        <a href="/"><strong>Go Blog</strong></a>
-        <a href="/archive">Archive</a>
-    </nav>
+<header class="site-header" role="banner">
+    <div class="header-inner">
+        <a href="/" class="site-title" aria-label="Go Blog - Home">Go Blog</a>
+        <nav class="site-nav" role="navigation" aria-label="Main navigation">
+            <a href="/" class="nav-link" aria-current="page">Home</a>
+            <a href="/archive" class="nav-link">Archive</a>
+            <a href="/rss.xml" class="nav-link" target="_blank" rel="noopener">RSS</a>
+        </nav>
+    </div>
 </header>
 {{end}}

@@ -2,15 +2,35 @@ package render
 
 import (
 	"html/template"
+	"reflect"
 	"regexp"
 	"strings"
 	"time"
 )
 
-func slugify(text string) string{
-	lowerText :=  strings.ToLower(text)
+func slugify(text string) string {
+	lowerText := strings.ToLower(text)
 	words := strings.Fields(lowerText)
 	return strings.Join(words, "-")
+}
+
+func getTitle(data any) string {
+	v := reflect.ValueOf(data)
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
+	if v.Kind() == reflect.Struct {
+		if titleField := v.FieldByName("Title"); titleField.IsValid() && titleField.Kind() == reflect.String {
+			return titleField.String()
+		}
+		// Try to get Metadata.Title
+		if metadataField := v.FieldByName("Metadata"); metadataField.IsValid() {
+			if titleField := metadataField.FieldByName("Title"); titleField.IsValid() && titleField.Kind() == reflect.String {
+				return titleField.String()
+			}
+		}
+	}
+	return "Go Blog"
 }
 
 var templateFuncs = template.FuncMap{
@@ -27,6 +47,8 @@ var templateFuncs = template.FuncMap{
 			return regexp.MustCompile(`<[^>]*>`).ReplaceAllString(string(html), "")
 		},
 		"slugify": slugify,
+		"now": func() time.Time { return time.Now() },
+		"getTitle": getTitle,
 		// "markdown": func(s string) template.HTML {
 		// 	var buf strings.Builder
 		// 	md.Convert([]byte(s), &buf)

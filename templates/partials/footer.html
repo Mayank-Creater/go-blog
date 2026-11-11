@@ -1,5 +1,12 @@
 {{define "footer"}}
-<footer>
-    <p>&copy; 2026 Go Blogs.</p>
+<footer class="site-footer" role="contentinfo">
+    <div class="footer-inner">
+        <p class="footer-copyright">&copy; {{ now.Format "2006" }} Go Blog. Built with Go.</p>
+        <div class="footer-links">
+            <a href="/archive" class="footer-link">Archive</a>
+            <a href="/rss.xml" class="footer-link" target="_blank" rel="noopener">RSS Feed</a>
+            <a href="https://github.com" class="footer-link" target="_blank" rel="noopener">GitHub</a>
+        </div>
+    </div>
 </footer>
 {{end}}

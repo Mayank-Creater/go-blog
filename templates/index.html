@@ -1,20 +1,43 @@
 {{ define "main" }}
-  <h1>Go Blog</h1>
-  <p>Markdown to HTML Blog</p>
-  <ul class="post-list">
+<div class="home-hero">
+    <h1 class="home-title">Go Blog</h1>
+    <p class="home-subtitle">Thoughts on Go, programming, and software engineering</p>
+    <p class="home-description">Exploring the Go ecosystem, sharing tutorials, and documenting the journey of building things with Go.</p>
+    <a href="/archive" class="home-cta">
+        Browse All Posts
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+    </a>
+</div>
+
+{{ if .Posts }}
+<ul class="post-list" role="list">
     {{ range .Posts }}
-      <li>
-        <article class="post-preview">
-          <h2><a href="/{{ .Metadata.Title | slugify }}.html">{{ .Metadata.Title }}</a></h2>
-          <time datetime="{{ .Metadata.Date }}">{{ .Metadata.Date }}</time>
-          {{ if .Metadata.Tags }}
-            <div class="tags">
-              {{ range .Metadata.Tags }}<span class="tag">{{ . }}</span>{{ end }}
-            </div>
-          {{ end }}
-          <!-- <p>{{ .Content | safeHTML}}</p> -->
+    <li>
+        <article class="post-card">
+            <header class="post-card-header">
+                <h2 class="post-card-title">
+                    <a href="/{{ .Metadata.Title | slugify }}.html">{{ .Metadata.Title }}</a>
+                </h2>
+                <div class="post-card-meta">
+                    <time class="post-card-date" datetime="{{ .Metadata.Date }}">{{ .Metadata.Date | dateFormat "Jan 2, 2006" }}</time>
+                    {{ if .Metadata.Tags }}
+                    <div class="post-card-tags" role="list" aria-label="Tags">
+                        {{ range .Metadata.Tags }}
+                        <span class="tag" role="listitem">{{ . }}</span>
+                        {{ end }}
+                    </div>
+                    {{ end }}
+                </div>
+            </header>
         </article>
-      </li>
+    </li>
     {{ end }}
-  </ul>
+</ul>
+{{ else }}
+<div class="post-card" style="text-align: center; padding: var(--spacing-3xl);">
+    <p style="color: var(--color-text-muted);">No posts yet. Check back soon!</p>
+</div>
+{{ end }}
 {{ end }}

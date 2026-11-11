@@ -1,5 +1,11 @@
 {{define "head"}}
-<head>
-    <title>Hello Ji</title>
-</head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A Go blog - sharing thoughts on Go, programming, and software engineering">
+    <meta name="theme-color" content="#2563eb">
+    <title>{{ getTitle . }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="alternate" type="application/rss+xml" title="Go Blog RSS" href="/rss.xml">
 {{end}}

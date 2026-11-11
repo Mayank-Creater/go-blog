@@ -4,17 +4,22 @@ import (
 	"bytes"
 	"fmt"
 	"html/template"
+	"io"
 	"os"
+	"path/filepath"
 
 	"github.com/Mayank-Creater/go-blog/internal/content"
 )
 
 type HomepageData struct{
 	Posts []content.Content
+	Title string
 }
 
 func Render(posts []content.Content, homePath string){
 	fmt.Println("IN render")
+
+	copyStaticFiles(homePath)
 
 	baseTmpl := template.New("base.html").Option("missingkey=error").Funcs(templateFuncs)
 
@@ -30,6 +35,7 @@ func Render(posts []content.Content, homePath string){
 
 	homeData := HomepageData{
 		Posts: posts,
+		Title: "Go Blog",
 	}
 
 	err := homeTmpl.ExecuteTemplate(&homeBuf, "base.html", homeData)
@@ -58,5 +64,50 @@ func Render(posts []content.Content, homePath string){
 		
 		_ = os.WriteFile(homePath+filePath, postBuf.Bytes(), 0644)
 
+	}
+}
+
+func copyStaticFiles(homePath string) {
+	staticSrc := filepath.Join(homePath, "static")
+	staticDst := filepath.Join(homePath, "public", "static")
+	
+	// Remove existing static folder in public
+	os.RemoveAll(staticDst)
+	
+	err := filepath.Walk(staticSrc, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		
+		relPath, err := filepath.Rel(staticSrc, path)
+		if err != nil {
+			return err
+		}
+		
+		dstPath := filepath.Join(staticDst, relPath)
+		
+		if info.IsDir() {
+			return os.MkdirAll(dstPath, info.Mode())
+		}
+		
+		// Copy file
+		srcFile, err := os.Open(path)
+		if err != nil {
+			return err
+		}
+		defer srcFile.Close()
+		
+		dstFile, err := os.Create(dstPath)
+		if err != nil {
+			return err
+		}
+		defer dstFile.Close()
+		
+		_, err = io.Copy(dstFile, srcFile)
+		return err
+	})
+	
+	if err != nil {
+		fmt.Printf("Error copying static files: %v\n", err)
 	}
 }
