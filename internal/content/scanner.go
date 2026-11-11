@@ -1,9 +1,11 @@
 package content
 
 import (
+	"cmp"
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
 )
 
 func ContentScanner(folderPath string) []Content{
@@ -36,11 +38,20 @@ func ContentScanner(folderPath string) []Content{
 			fmt.Println("Error parsing file:", err)
 			continue
 		}
+
+		if metadata.Draft == true{
+			continue
+		}
 	
 		content = append(content, Content{
 			Metadata: metadata,
 			Content: postContent,
 		})
 	}	
+
+	slices.SortFunc(content, func(a, b Content) int {
+		return cmp.Compare(a.Metadata.Date, b.Metadata.Date)
+	})
+
 	return content
 }
