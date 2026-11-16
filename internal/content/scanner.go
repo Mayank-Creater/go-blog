@@ -8,19 +8,19 @@ import (
 	"slices"
 )
 
-func ContentScanner(folderPath string) []Content{
+func ContentScanner(folderPath string) ([]Content, error) {
 	entries, err := os.ReadDir(folderPath)
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("reading content directory %q: %w", folderPath, err)
 	}
 
-	var content []Content
+	var contentList []Content
 
-	for _, entry := range entries{
-		if entry.IsDir(){
+	for _, entry := range entries {
+		if entry.IsDir() {
 			continue
 		}
-		if filepath.Ext(entry.Name()) != ".md"{
+		if filepath.Ext(entry.Name()) != ".md" {
 			continue
 		}
 
@@ -29,29 +29,29 @@ func ContentScanner(folderPath string) []Content{
 
 		input, err := os.ReadFile(fullPath)
 		if err != nil {
-			fmt.Println("Error Reading file:", err)
+			fmt.Fprintf(os.Stderr, "Error reading file %s: %v\n", fullPath, err)
 			continue
 		}
 
 		metadata, postContent, err := ContentParser(input)
 		if err != nil {
-			fmt.Println("Error parsing file:", err)
+			fmt.Fprintf(os.Stderr, "Error parsing file %s: %v\n", fullPath, err)
 			continue
 		}
 
-		if metadata.Draft == true{
+		if metadata.Draft {
 			continue
 		}
-	
-		content = append(content, Content{
+
+		contentList = append(contentList, Content{
 			Metadata: metadata,
-			Content: postContent,
+			Content:  postContent,
 		})
-	}	
+	}
 
-	slices.SortFunc(content, func(a, b Content) int {
+	slices.SortFunc(contentList, func(a, b Content) int {
 		return cmp.Compare(a.Metadata.Date, b.Metadata.Date)
 	})
 
-	return content
+	return contentList, nil
 }

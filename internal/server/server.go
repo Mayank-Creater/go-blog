@@ -8,18 +8,19 @@ import (
 	"io/fs"
 )
 
-func Serve(port string, embeddedFiles embed.FS){
+func Serve(port string, embeddedFiles embed.FS) {
 	staticFS, err := fs.Sub(embeddedFiles, "static")
 	if err != nil {
-		fmt.Printf("Error Embedding: %v\n", err)
+		fmt.Printf("Error embedding static files: %v\n", err)
 	}
+
 	staticDir := "./public"
 	fileServer := http.FileServer(http.Dir(staticDir))
 
 	http.Handle("/", fileServer)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(staticFS))))
 
-	fmt.Printf("Starting at http://localhost:8080\n")
+	fmt.Printf("Starting server at http://localhost%s\n", port)
 	fmt.Printf("Serving files from %s\n", staticDir)
 
 	err = http.ListenAndServe(port, nil)

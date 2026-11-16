@@ -20,11 +20,11 @@ func tagify(text string) string{
 	return strings.Join(words, ", ")
 }
 
-func Scaffold(title string, tags string, draft bool, description string, cover string, homePath string){
+func Scaffold(title string, tags string, draft bool, description string, cover string, homePath string) error {
 	filePath := filepath.Join(homePath, "content", fmt.Sprintf("%s.md", slugify(title)))
-	_, err := os.Create(filePath)
-	if err != nil {
-		fmt.Printf("Error Creating file: %v\n", err)
+
+	if err := os.MkdirAll(filepath.Dir(filePath), 0755); err != nil {
+		return fmt.Errorf("creating content directory: %w", err)
 	}
 
 	frontmatter := `---
@@ -40,10 +40,12 @@ cover: "%s"
 `
 	now := time.Now()
 	date := now.Format("2006-01-02")
-	frontmatter = fmt.Sprintf(frontmatter, title, date, tagify(tags), false, description, cover, title)
+	frontmatter = fmt.Sprintf(frontmatter, title, date, tagify(tags), draft, description, cover, title)
 
-	err = os.WriteFile(filePath, []byte(frontmatter), 0644)
-	if err != nil {
-		fmt.Printf("Error Writing File: %v\n", err)
+	if err := os.WriteFile(filePath, []byte(frontmatter), 0644); err != nil {
+		return fmt.Errorf("writing scaffold file %q: %w", filePath, err)
 	}
+
+	fmt.Printf("Created new post: %s\n", filePath)
+	return nil
 }
